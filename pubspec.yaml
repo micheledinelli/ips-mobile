@@ -1,0 +1,35 @@
+name: mobile
+description: "A new Flutter project."
+publish_to: "none"
+version: 0.1.0
+
+environment:
+  sdk: ">=3.4.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_dotenv: ^5.1.0
+  flutter_local_notifications: ^17.1.2
+  google_nav_bar: ^5.0.6
+  http: ^1.2.1
+  logger: ^2.3.0
+  permission_handler: ^11.3.1
+  wifi_scan: ^0.4.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - .env
+  fonts:
+    - family: NotoSansMono
+      fonts:
+        - asset: fonts/NotoSansMono-Regular.ttf
+          weight: 400
+        - asset: fonts/NotoSansMono-Bold.ttf
+          weight: 800
