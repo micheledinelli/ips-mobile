@@ -39,7 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
     wifiAndBleScan();
 
     // Fetch the position every 10 seconds
-    _timer = Timer.periodic(const Duration(seconds: 15), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 10), (timer) {
       wifiAndBleScan();
     });
   }
@@ -172,12 +172,23 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: ListView.builder(
                   itemCount: _position!.devicesRequired!.length,
                   itemBuilder: (context, index) {
-                    return DeviceCard(
-                        device: _position!.devicesRequired![index],
-                        isNearby: _bleDevices.any((d) =>
+                    Device? device;
+                    try {
+                      device = _bleDevices.firstWhere(
+                        (d) =>
                             (d.deviceId ==
                                 _position!.devicesRequired![index].deviceId) ||
-                            d.name == _position!.devicesRequired![index].name));
+                            d.name == _position!.devicesRequired![index].name,
+                      );
+
+                      _logger.d({device.name, device.rssi});
+                    } catch (e) {
+                      _logger.e('Error finding device: $e');
+                      _logger.d(device);
+                    }
+                    return DeviceCard(
+                        device: _position!.devicesRequired![index],
+                        rssi: device != null ? device.rssi! : -100);
                   },
                 ),
               )

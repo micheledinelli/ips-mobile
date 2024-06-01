@@ -13,7 +13,6 @@ class DevicesScreen extends StatefulWidget {
 
 class _DevicesScreenState extends State<DevicesScreen> {
   final _logger = LoggerService.logger;
-  late Timer _timer;
   StreamSubscription<List<ScanResult>>? _scanSubscription;
   final flutterBlue = FlutterBluePlus();
 
@@ -24,7 +23,6 @@ class _DevicesScreenState extends State<DevicesScreen> {
 
   @override
   void dispose() {
-    _timer.cancel();
     _scanSubscription?.cancel();
     super.dispose();
   }

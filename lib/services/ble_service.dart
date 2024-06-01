@@ -24,6 +24,11 @@ class BleService {
         .map((scanResult) => Device.fromScanResult(scanResult))
         .toList();
 
+    // Filter out the devices with rssi < -70
+    devices = devices
+        .where((device) => device.rssi != null && device.rssi! > -70)
+        .toList();
+
     return devices;
   }
 }

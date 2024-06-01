@@ -3,9 +3,9 @@ import 'package:mobile/models/device.dart';
 
 class DeviceCard extends StatelessWidget {
   final Device device;
-  final bool isNearby;
+  final int rssi;
 
-  const DeviceCard({required this.device, required this.isNearby, super.key});
+  const DeviceCard({required this.device, required this.rssi, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +21,7 @@ class DeviceCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: _buildIcon(isNearby),
+              leading: _buildIcon(rssi),
               title: Text(
                 device.name,
                 style: const TextStyle(
@@ -43,14 +43,17 @@ class DeviceCard extends StatelessWidget {
     );
   }
 
-  Widget _buildIcon(bool isNearby) {
+  Widget _buildIcon(int rssi) {
     IconData iconData;
     Color color;
-    if (isNearby) {
+    if (rssi > -50) {
       iconData = Icons.bluetooth;
       color = Colors.green;
+    } else if (rssi > -70) {
+      iconData = Icons.bluetooth;
+      color = Colors.orange;
     } else {
-      iconData = Icons.bluetooth_disabled;
+      iconData = Icons.bluetooth;
       color = Colors.red;
     }
     return Icon(iconData, size: 30, color: color);
