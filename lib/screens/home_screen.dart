@@ -1,10 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:ffi';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:mobile/models/access_point.dart';
+import 'package:mobile/models/device.dart';
 import 'package:mobile/models/position.dart';
+import 'package:mobile/services/ble_service.dart';
 import 'package:mobile/services/logger_service.dart';
 import 'package:mobile/services/notification_service.dart';
 import 'package:mobile/services/wifi_service.dart';
@@ -22,10 +26,12 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final _logger = LoggerService.logger;
   final _wifiService = WifiService();
+  final _bleService = BleService();
   final _notificationService = NotificationService();
 
   Position? _position;
   List<AccessPoint> _accessPoints = [];
+  List<Device> _bleDevices = [];
 
   late Timer _timer;
 
@@ -35,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
     wifiAndBleScan();
 
     // Fetch the position every 10 seconds
-    _timer = Timer.periodic(const Duration(seconds: 10), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 15), (timer) {
       wifiAndBleScan();
     });
   }
@@ -55,12 +61,19 @@ class _HomeScreenState extends State<HomeScreen> {
       });
     }
 
+    var bleDevices = await _bleService.getBleDevices();
+    if (bleDevices.isNotEmpty && mounted) {
+      setState(() {
+        _bleDevices = bleDevices;
+      });
+    }
+
     // Fetch the position based on the access points
-    fetchPosition(accessPoints: _accessPoints, bleDevices: []);
+    fetchPosition(accessPoints: accessPoints, bleDevices: bleDevices);
   }
 
   Future<void> fetchPosition(
-      {List<AccessPoint>? accessPoints, List<String>? bleDevices}) async {
+      {List<AccessPoint>? accessPoints, List<Device>? bleDevices}) async {
     if (accessPoints == null || accessPoints.isEmpty) {
       _logger.w("No access points available to fetch position");
       return;
@@ -73,6 +86,10 @@ class _HomeScreenState extends State<HomeScreen> {
       List<Map<String, dynamic>> accessPointsMap =
           _accessPoints.map((ap) => ap.toMap()).toList();
 
+      // Convert the list of devices to a list of maps
+      List<Map<String, dynamic>> bleDevicesMap =
+          _bleDevices.map((d) => d.toMap()).toList();
+
       final response = await http.post(
         Uri.parse('$backendUrl/position'),
         headers: <String, String>{
@@ -81,7 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
         body: jsonEncode({
           'userId': dotenv.env['ID'],
           'accessPoints': accessPointsMap,
-          'bleDevices': bleDevices
+          'bleDevices': bleDevicesMap
         }),
       );
 
@@ -159,7 +176,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   itemBuilder: (context, index) {
                     return DeviceCard(
                         device: _position!.devicesRequired![index],
-                        isNearby: true);
+                        isNearby: _bleDevices.any((d) =>
+                            (d.deviceId ==
+                                _position!.devicesRequired![index].deviceId) ||
+                            d.name == _position!.devicesRequired![index].name));
                   },
                 ),
               )

@@ -3,10 +3,8 @@ import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
 class BleDeviceDiscoveredCard extends StatelessWidget {
   final ScanResult device;
-  final bool isNearby;
 
-  const BleDeviceDiscoveredCard(
-      {required this.device, required this.isNearby, super.key});
+  const BleDeviceDiscoveredCard({required this.device, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -24,17 +22,25 @@ class BleDeviceDiscoveredCard extends StatelessWidget {
             ListTile(
               leading: _buildIcon(device.rssi),
               title: Text(
-                device.device.remoteId.toString(),
+                device.device.platformName.toString().isNotEmpty
+                    ? device.device.platformName.toString()
+                    : "Unnamed",
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
                 ),
               ),
-              subtitle: Text(
+              trailing: Text(
                 'RSSI: ${device.rssi}',
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 12,
                   color: Colors.grey[600],
+                ),
+              ),
+              subtitle: Text(
+                "${device.device.remoteId}",
+                style: const TextStyle(
+                  fontSize: 12,
                 ),
               ),
             ),

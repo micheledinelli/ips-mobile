@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:mobile/screens/devices_screen.dart';
 import 'package:mobile/screens/home_screen.dart';
+import 'package:mobile/widgets/ble_dialog.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,6 +25,22 @@ class _MyAppState extends State<MyApp> {
     HomeScreen(),
     DevicesScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    FlutterBluePlus.adapterState.listen((state) {
+      if (state == BluetoothAdapterState.off) {
+        showDialog(
+            context: context,
+            builder: (context) {
+              return const BleDialog();
+            });
+      }
+    });
+
+    // Connectivity result = await(Connectivity().checkConnectivity());
+  }
 
   @override
   Widget build(BuildContext context) {
