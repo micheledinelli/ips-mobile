@@ -1,9 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:ffi';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:mobile/models/access_point.dart';
 import 'package:mobile/models/device.dart';

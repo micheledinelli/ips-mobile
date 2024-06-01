@@ -18,7 +18,7 @@ class Device {
   factory Device.fromScanResult(ScanResult scanResult) {
     return Device(
       deviceId: scanResult.device.remoteId.toString(),
-      name: scanResult.device.platformName ?? 'Unknown',
+      name: scanResult.device.platformName,
       rssi: scanResult.rssi,
     );
   }
