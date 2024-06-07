@@ -22,7 +22,8 @@ class WifiService {
     // if (!nearbyWifiDevicesPermission.isGranted) {
     //   logger.w("Nearby wifi devices permission not granted");
     // }
-
+    bool scanTriggered = await WiFiScan.instance.startScan();
+    logger.i("Scan triggered: $scanTriggered");
     final can =
         await WiFiScan.instance.canGetScannedResults(askPermissions: true);
     switch (can) {
