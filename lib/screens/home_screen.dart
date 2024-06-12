@@ -32,35 +32,53 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Device> _bleDevices = [];
 
   late Timer _timer;
+  late Timer _countDownTimer;
+  int _secondsRemaining = 31;
 
   @override
   void initState() {
     super.initState();
     wifiAndBleScan();
 
-    // Fetch the position every 10 seconds
-    _timer = Timer.periodic(const Duration(seconds: 10), (timer) {
+    // Fetch the position every 30 seconds
+    _timer = Timer.periodic(const Duration(seconds: 31), (timer) {
       wifiAndBleScan();
+    });
+
+    _countDownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        if (_secondsRemaining > 0) {
+          _secondsRemaining--;
+        } else {
+          _secondsRemaining = 31;
+        }
+      });
     });
   }
 
   @override
   void dispose() {
-    super.dispose();
     _timer.cancel();
+    _countDownTimer.cancel();
+    super.dispose();
   }
 
   Future<void> wifiAndBleScan() async {
     // Retrieve the list of access points and update the state
     var accessPoints = await _wifiService.getAccessPoints();
-    if (accessPoints.isNotEmpty && mounted) {
+    if (mounted) {
       setState(() {
         _accessPoints = accessPoints;
       });
     }
 
+    if (accessPoints.isEmpty) {
+      _logger.w("No access points available to fetch position");
+      return;
+    }
+
     var bleDevices = await _bleService.getBleDevices();
-    if (bleDevices.isNotEmpty && mounted) {
+    if (mounted) {
       setState(() {
         _bleDevices = bleDevices;
       });
@@ -68,6 +86,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
     // Fetch the position based on the access points
     fetchPosition(accessPoints: accessPoints, bleDevices: bleDevices);
+
+    if (mounted) {
+      setState(() {
+        _secondsRemaining = 31;
+      });
+    }
   }
 
   Future<void> fetchPosition(
@@ -96,7 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
         body: jsonEncode({
           'userId': dotenv.env['ID'],
           'accessPoints': accessPointsMap,
-          'bleDevices': bleDevicesMap
+          'bleDevices': bleDevicesMap,
         }),
       );
 
@@ -109,6 +133,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
           bool granted = _position!.granted!;
           if (!granted) {
+            _logger.w('Room: ${_position!.room}');
+            _logger.w('Access denied: ${_position!.violation}');
             _notificationService.showNotification(
               title: 'Access Denied',
               body: _position!.violation!,
@@ -193,6 +219,20 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               )
             : Container(),
+        Container(
+          padding: const EdgeInsets.all(8.0),
+          decoration: BoxDecoration(
+            color: Colors.black54,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Text(
+            'Next scan in: $_secondsRemaining s',
+            style: const TextStyle(
+              fontSize: 16,
+              color: Colors.white,
+            ),
+          ),
+        ),
       ],
     );
   }

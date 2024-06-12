@@ -49,7 +49,7 @@ class DeviceCard extends StatelessWidget {
     if (rssi > -50) {
       iconData = Icons.bluetooth;
       color = Colors.green;
-    } else if (rssi > -70) {
+    } else if (rssi > -90) {
       iconData = Icons.bluetooth;
       color = Colors.orange;
     } else {

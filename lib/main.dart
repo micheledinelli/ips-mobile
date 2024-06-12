@@ -38,8 +38,6 @@ class _MyAppState extends State<MyApp> {
             });
       }
     });
-
-    // Connectivity result = await(Connectivity().checkConnectivity());
   }
 
   @override
