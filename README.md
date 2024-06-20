@@ -4,4 +4,7 @@
 
 This is the mobile application component of a indoor positioning application developed for the university course Context Aware Systems @unibo.
 
-<!-- ![alt](public/screenshot-home.png) -->
+![alt](screenshots/one.jpg)
+<!-- ![alt](screenshots/two.jpg)
+![alt](screenshots/three.jpg)
+![alt](screenshots/four.jpg) -->
